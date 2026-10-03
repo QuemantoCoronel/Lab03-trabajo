@@ -24,3 +24,27 @@ resource "docker_image" "postgres" {
   name         = "postgres:15-alpine"
   keep_locally = false
 }
+
+resource "docker_network" "dev_network" {
+  name = "dev_network"
+}
+
+resource "docker_container" "bd_dev" {
+  name  = "bd-dev"
+  image = docker_image.postgres.image_id
+
+  env = [
+    "POSTGRES_USER=admin",
+    "POSTGRES_PASSWORD=admin",
+    "POSTGRES_DB=bd"
+  ]
+
+  ports {
+    internal = 5432
+    external = 4003
+  }
+
+  networks_advanced {
+    name = docker_network.dev_network.name
+  }
+}
