@@ -112,3 +112,43 @@ resource "docker_container" "bd_qa" {
     name = docker_network.qa_network.name
   }
 }
+
+resource "docker_container" "api_qa" {
+  name  = "api-qa"
+  image = docker_image.node.image_id
+  
+  command = ["node", "/app/index.js"]
+
+  ports {
+    internal = 3000
+    external = 5002
+  }
+
+  volumes {
+    host_path      = abspath("${path.module}/../backend/index.js")
+    container_path = "/app/index.js"
+  }
+
+  networks_advanced {
+    name = docker_network.qa_network.name
+  }
+}
+
+resource "docker_container" "web_qa" {
+  name  = "web-qa"
+  image = docker_image.nginx.image_id
+
+  ports {
+    internal = 80
+    external = 5001
+  }
+
+  volumes {
+    host_path      = abspath("${path.module}/../frontend/index.html")
+    container_path = "/usr/share/nginx/html/index.html"
+  }
+
+  networks_advanced {
+    name = docker_network.qa_network.name
+  }
+}
