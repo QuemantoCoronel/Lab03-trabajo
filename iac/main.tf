@@ -88,3 +88,27 @@ resource "docker_container" "web_dev" {
     name = docker_network.dev_network.name
   }
 }
+
+resource "docker_network" "qa_network" {
+  name = "qa_network"
+}
+
+resource "docker_container" "bd_qa" {
+  name  = "bd-qa"
+  image = docker_image.postgres.image_id
+
+  env = [
+    "POSTGRES_USER=admin",
+    "POSTGRES_PASSWORD=admin",
+    "POSTGRES_DB=bd"
+  ]
+
+  ports {
+    internal = 5432
+    external = 5003
+  }
+
+  networks_advanced {
+    name = docker_network.qa_network.name
+  }
+}
